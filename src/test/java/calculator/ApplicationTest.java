@@ -17,10 +17,42 @@ class ApplicationTest extends NsTest {
     }
 
     @Test
+    void 연속된_구분자_테스트() {
+        assertSimpleTest(() -> {
+            run("1,,2");
+            assertThat(output()).contains("결과 : 3");
+        });
+    }
+
+    @Test
+    void 정규식_특수문자_구분자_테스트() {
+        assertSimpleTest(() -> {
+            run("//*\\n1*2*3");
+            assertThat(output()).contains("결과 : 6");
+        });
+    }
+
+    @Test
     void 예외_테스트() {
         assertSimpleTest(() ->
-            assertThatThrownBy(() -> runException("-1,2,3"))
-                .isInstanceOf(IllegalArgumentException.class)
+                assertThatThrownBy(() -> runException("-1,2,3"))
+                        .isInstanceOf(IllegalArgumentException.class)
+        );
+    }
+
+    @Test
+    void 허용되지_않은_문자_포함시_예외_발생() {
+        assertSimpleTest(() ->
+                assertThatThrownBy(() -> runException("1,a,2"))
+                        .isInstanceOf(IllegalArgumentException.class)
+        );
+    }
+
+    @Test
+    void 커스텀_구분자_형식_오류시_예외_발생() {
+        assertSimpleTest(() ->
+                assertThatThrownBy(() -> runException("//;\\n1:2;3"))
+                        .isInstanceOf(IllegalArgumentException.class)
         );
     }
 
